@@ -1,0 +1,13 @@
+.idea/
+.DS_Store
+node_modules/
+public_html/build/
+logs
+log
+*.lock
+yarn.lock
+*.log
+package-lock.json
+.env.local
+.prettierrc
+.vscode
