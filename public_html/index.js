@@ -114,7 +114,7 @@ function checkProfileMapTarget(profile, target) {
 }
 
 /**
- * return random 1 template trong list template
+ * return template cho profile
  *
  */
 async function getTemplateByTargetIDs(niid, targetIDs) {
@@ -171,6 +171,7 @@ const profile = {
     const targetIDs = await getTargetIDMapProfile(profile, targets);
     if (targetIDs && targetIDs.length) {
         let templates = await getTemplateByTargetIDs(niid, targetIDs);
+        console.log(templates);
         return templates;
     }
     return [];
