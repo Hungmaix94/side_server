@@ -92,10 +92,13 @@ async function getTargetIDMapProfile(profile, targets) {
 function checkProfileMapTarget(profile, target) {
     let locationTarget = target.location;
     let industryTarget = target.industry;
-    let locationProfile = profile.location;
-    let industryProfile = profile.industry;
+    let jobTitleTarget = target.job_title;
+    let locationProfile = get(profile, "location");
+    let industryProfile = get(profile, "industry", []);
+    let jobTitleProfile = get(profile, "job_title", []);
     let matchLocation = false;
     let matchIndustry = false;
+    let matchJobTitle = false;
 
 
     /**
@@ -106,12 +109,17 @@ function checkProfileMapTarget(profile, target) {
         matchLocation = true;
     }
 
-    if ((industryTarget && industryTarget.length === 0) || industryTarget.includes(industryProfile)) {
+    if ((industryTarget && industryTarget.length === 0) || industryTarget.some(industry => industryProfile.includes(industry))) {
         matchIndustry = true;
     }
 
-    return matchLocation && matchIndustry;
+    if ((jobTitleTarget && jobTitleTarget.length === 0) || jobTitleTarget.some(job_title => jobTitleProfile.includes(job_title))) {
+        matchJobTitle = true;
+    }
+
+    return matchLocation && matchIndustry && matchJobTitle;
 }
+
 
 /**
  * return template cho profile
@@ -123,27 +131,10 @@ async function getTemplateByTargetIDs(niid, targetIDs) {
     const templates = await TemplateModel.find({
         $and: [{
             active: true,
+            niid: niid,
             target_id: {
                 $in: targetIDs
             }
-        }, {
-            $or: [{
-                $and: [{
-                    is_default: true
-                }, {
-                    niid_not_used: {
-                        $ne: niid
-                    }
-                }]
-            }, {
-                $and: [{
-                    is_default: {
-                        $ne: false
-                    }
-                }, {
-                    niid: niid
-                }]
-            }]
         }]
     }).exec()
         .then((templates) => {
@@ -163,7 +154,8 @@ async function getTemplateByTargetIDs(niid, targetIDs) {
 const niid = "ACoAAC6P1LgBEmq374spirHGHRfnBtYFoV8g108";
 const profile = {
     location: "Vietnam",
-    industry: "IT"
+    industry: ["IT", "Fintech", "Banking"],
+    job_title: ["Java Developer", "Fullstack Developer"]
 };
 
 (async () => {
